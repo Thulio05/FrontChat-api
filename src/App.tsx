@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import { useState, useEffect } from 'react';
+import { socket } from './services/socket'; // Importamos nosso socket
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  // Um estado para guardar e exibir se estamos conectados
+  const [isConnected, setIsConnected] = useState(false);
+
+  // O useEffect é ideal para gerenciar conexões e outros "efeitos colaterais"
+  useEffect(() => {
+    // Quando o evento 'connect' do socket for recebido, atualizamos nosso estado
+    socket.on('connect', () => {
+      setIsConnected(true);
+      console.log('Conectado ao servidor com o id:', socket.id);
+    });
+
+    // Quando o evento 'disconnect' for recebido...
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+      console.log('Desconectado do servidor.');
+    });
+
+    // Agora, mandamos o socket conectar de fato
+    socket.connect();
+
+    // Esta função de retorno do useEffect é uma "função de limpeza".
+    // Ela será executada quando o componente sair da tela, garantindo
+    // que a conexão seja encerrada de forma limpa.
+    return () => {
+      socket.disconnect();
+      socket.off('connect');
+      socket.off('disconnect');
+    };
+  }, []); // O array vazio [] garante que este efeito rode apenas uma vez
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h1>Chat em Tempo Real</h1>
+      <h2>Status: {isConnected ? '✅ Conectado' : '❌ Desconectado'}</h2>
+    </div>
+  );
 }
 
-export default App
+export default App;
