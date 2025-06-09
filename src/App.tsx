@@ -1,37 +1,33 @@
 // src/App.tsx
 import { useState, useEffect } from 'react';
-import { socket } from './services/socket'; // Importamos nosso socket
+import { socket } from './services/socket';
 
 export function App() {
-  // Um estado para guardar e exibir se estamos conectados
   const [isConnected, setIsConnected] = useState(false);
 
-  // O useEffect é ideal para gerenciar conexões e outros "efeitos colaterais"
   useEffect(() => {
-    // Quando o evento 'connect' do socket for recebido, atualizamos nosso estado
+    // Ao conectar, atualiza o estado
     socket.on('connect', () => {
       setIsConnected(true);
       console.log('Conectado ao servidor com o id:', socket.id);
     });
 
-    // Quando o evento 'disconnect' for recebido...
+    // Ao desconectar, atualiza o estado
     socket.on('disconnect', () => {
       setIsConnected(false);
       console.log('Desconectado do servidor.');
     });
 
-    // Agora, mandamos o socket conectar de fato
+    // Força o socket a se conectar
     socket.connect();
 
-    // Esta função de retorno do useEffect é uma "função de limpeza".
-    // Ela será executada quando o componente sair da tela, garantindo
-    // que a conexão seja encerrada de forma limpa.
+    // Função de limpeza
     return () => {
       socket.disconnect();
       socket.off('connect');
       socket.off('disconnect');
     };
-  }, []); // O array vazio [] garante que este efeito rode apenas uma vez
+  }, []);
 
   return (
     <div>
