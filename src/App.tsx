@@ -1,48 +1,67 @@
+import { useEffect, useState } from 'react';
+import { socket } from './services/socket';
+import { ChatList } from './components/ChatList';
+import { MessageList } from './components/MessageList';
+import { MessageInput } from './components/MessageInput';
 import './App.css';
-import { useState } from 'react';
-
 
 function App() {
-  const [newMessage, setNewMessage] = useState('');
+  const [selectedContact, setSelectedContact] = useState('Maria'); // valor inicial opcional
   const [messages, setMessages] = useState<string[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
 
-  function handleSend(e: React.FormEvent) {
-    e.preventDefault(); // impede o recarregamento da página
-    if (newMessage.trim() === '') return; // ignora mensagens vazias
+  // 1️⃣ Conecta no servidor assim que o app carrega
+  useEffect(() => {
+    socket.connect();
 
-    setMessages(prev => [...prev, newMessage]); // adiciona a nova mensagem
-    setNewMessage(''); // limpa o input
+    socket.on('connect', () => {
+      setIsConnected(true);
+      console.log('🔌 Conectado ao servidor! ID:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+      console.log('❌ Desconectado do servidor');
+    });
+
+    // 2️⃣ Escuta mensagens recebidas do servidor
+    socket.on('message', (msg: string) => {
+      console.log('📩 Mensagem recebida:', msg);
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    // 3️⃣ Limpa os listeners quando sair do componente
+    return () => {
+      socket.disconnect();
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('message');
+    };
+  }, []);
+
+  // 4️⃣ Quando enviar mensagem
+  function handleSend(message: string) {
+    setMessages((prev) => [...prev, message]);
+    socket.emit('message', message); // envia para o servidor
   }
-
 
   return (
     <div className="container">
-      <aside className="sidebar">
-        <h2>Conversas</h2>
-        <ul className="chat-list">
-          <li>Maria</li>
-          <li>João</li>
-          <li>Ana</li>
-        </ul>
-      </aside>
-
+      <ChatList onSelect={setSelectedContact} />
       <main className="chat">
-        <div className="messages">
-          {messages.map((msg, index) => (
-          <div key={index} className="message sent">
-            {msg}
-          </div>
-          ))}
+        <div className="chat-header">
+          <h2>{selectedContact}</h2>
         </div>
-        <form className="input-area" onSubmit={handleSend}>
-          <input
-            type="text"
-            placeholder="Digita aí campeão..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-          />
-          <button type="submit">Enviar</button>
-        </form>
+        <h2 className="status">
+          Status: {isConnected ? '✅ Conectado' : '❌ Desconectado'}
+        </h2>
+        <MessageList messages={messages} />
+        <MessageInput
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          onSend={handleSend}
+        />
       </main>
     </div>
   );
