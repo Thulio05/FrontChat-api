@@ -153,3 +153,9 @@ body {
   border-radius: 50%;
   object-fit: cover;
 }
+
+.last-message {
+  display: block;
+  font-size: 12px;
+  color: #ddd;
+}

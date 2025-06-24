@@ -1,5 +1,6 @@
 type ChatListProps = {
   onSelect: (name: string) => void;
+  lastMessages: Record<string, string>;
 };
 
 export function ChatList({ onSelect }: ChatListProps) {
