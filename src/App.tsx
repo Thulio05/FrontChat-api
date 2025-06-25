@@ -80,8 +80,11 @@ function App() {
 
   const [contacts, setContacts] = useState([
     { name: 'Tuio', avatar: 'https://i.pravatar.cc/40?u=tuio', lastMessage: '' },
-    { name: 'Evertu 🫢', avatar: 'https://i.pravatar.cc/40?u=evertu', lastMessage: '' },
-    { name: 'Kaio Vivi <3', avatar: 'https://i.pravatar.cc/40?u=kaio', lastMessage: '' }
+    { name: 'Evertu', avatar: 'https://i.pravatar.cc/40?u=evertu', lastMessage: '' },
+    { name: 'Jeová', avatar: 'https://i.pravatar.cc/40?u=jeová', lastMessage: '' },
+    { name: 'A porra do Lórax', avatar: 'https://i.pravatar.cc/40?u=loráx', lastMessage: '' },
+    { name: 'Aline Barros', avatar: 'https://i.pravatar.cc/40?u=aline', lastMessage: '' },
+    { name: 'K"io Vivi', avatar: 'https://i.pravatar.cc/40?u=kaka', lastMessage: '' },
   ]);
 
   useEffect(() => {
