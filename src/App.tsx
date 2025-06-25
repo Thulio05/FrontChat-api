@@ -1,3 +1,4 @@
+// App.tsx
 import { useEffect, useState } from 'react';
 import { socket } from './services/socket';
 import { ChatList } from './components/ChatList';
@@ -5,37 +6,42 @@ import { MessageList } from './components/MessageList';
 import { MessageInput } from './components/MessageInput';
 import './App.css';
 
+// Tipagem para mensagens com metadados
+interface ChatMessage {
+  text: string;
+  timestamp: string;
+  from: 'me' | 'them';
+}
+
 function App() {
-  const [selectedContact, setSelectedContact] = useState('Maria');
-  const [messages, setMessages] = useState<Record<string, string[]>>({});
+  const [selectedContact, setSelectedContact] = useState('Tuio');
+  const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
 
-  // 🔗 Conexão com o servidor
   useEffect(() => {
     socket.connect();
 
     socket.on('connect', () => {
       setIsConnected(true);
-      console.log('🔌 Conectado ao servidor! ID:', socket.id);
     });
 
     socket.on('disconnect', () => {
       setIsConnected(false);
-      console.log('❌ Desconectado do servidor');
     });
 
-    // 🎧 Recebe mensagens
     socket.on('message', (data: { from: string; message: string }) => {
-      console.log('📩 Mensagem recebida:', data);
-
+      const msg: ChatMessage = {
+        text: data.message,
+        timestamp: new Date().toLocaleTimeString(),
+        from: 'them'
+      };
       setMessages((prev) => ({
         ...prev,
-        [data.from]: [...(prev[data.from] || []), data.message]
+        [data.from]: [...(prev[data.from] || []), msg]
       }));
     });
 
-    // 🧹 Limpa os listeners ao desmontar
     return () => {
       socket.disconnect();
       socket.off('connect');
@@ -44,38 +50,57 @@ function App() {
     };
   }, []);
 
-  // ✉️ Envio de mensagem
   function handleSend(message: string) {
-    if (!message.trim()) return;
+    const newMsg: ChatMessage = {
+      text: message,
+      timestamp: new Date().toLocaleTimeString(),
+      from: 'me'
+    };
 
     setMessages((prev) => ({
       ...prev,
-      [selectedContact]: [...(prev[selectedContact] || []), message]
+      [selectedContact]: [...(prev[selectedContact] || []), newMsg]
     }));
 
-    // Envia para o servidor informando para quem é a mensagem
-    socket.emit('message', {
-      to: selectedContact,
-      message
-    });
+    socket.emit('message', message);
 
-    setNewMessage('');
+    // Simula resposta automática após 1.5s
+    setTimeout(() => {
+      const autoResponse: ChatMessage = {
+        text: 'Recebido! 👍',
+        timestamp: new Date().toLocaleTimeString(),
+        from: 'them'
+      };
+      setMessages((prev) => ({
+        ...prev,
+        [selectedContact]: [...(prev[selectedContact] || []), autoResponse]
+      }));
+    }, 1500);
   }
 
-  // 📜 Últimas mensagens para a lista de contatos
-  const lastMessages = Object.fromEntries(
-    Object.entries(messages).map(([contact, msgs]) => [
-      contact,
-      msgs[msgs.length - 1] || ''
-    ])
-  );
+  const [contacts, setContacts] = useState([
+    { name: 'Tuio', avatar: 'https://i.pravatar.cc/40?u=tuio', lastMessage: '' },
+    { name: 'Evertu 🫢', avatar: 'https://i.pravatar.cc/40?u=evertu', lastMessage: '' },
+    { name: 'Kaio Vivi <3', avatar: 'https://i.pravatar.cc/40?u=kaio', lastMessage: '' }
+  ]);
+
+  useEffect(() => {
+    setContacts((prev) =>
+      prev.map((c) => ({
+        ...c,
+        lastMessage: messages[c.name]?.slice(-1)[0]?.text || ''
+      }))
+    );
+  }, [messages]);
 
   return (
     <div className="container">
       <ChatList
         onSelect={setSelectedContact}
-        lastMessages={lastMessages}
+        contacts={contacts}
+        selected={selectedContact}
       />
+
       <main className="chat">
         <div className="chat-header">
           <h2>{selectedContact}</h2>

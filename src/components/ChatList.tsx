@@ -1,15 +1,16 @@
-type ChatListProps = {
-  onSelect: (name: string) => void;
-  lastMessages: Record<string, string>;
+type Contact = {
+  name: string;
+  avatar: string;
+  lastMessage: string;
 };
 
-export function ChatList({ onSelect }: ChatListProps) {
-  const contacts = [
-    { name: 'Tuio', avatar: 'https://i.pravatar.cc/40?u=tuio' },
-    { name: 'Evertu 🫢', avatar: 'https://i.pravatar.cc/40?u=evertu' },
-    { name: 'Kaio Vivi <3', avatar: 'https://i.pravatar.cc/40?u=kaio' }
-  ];
+type ChatListProps = {
+  onSelect: (name: string) => void;
+  contacts: Contact[];
+  selected: string; // ✅ Adicione isso no tipo
+};
 
+export function ChatList({ onSelect, contacts, selected }: ChatListProps) { // ✅ Adicione `selected` aqui
   return (
     <div className="sidebar">
       <h2>Conversas</h2>
@@ -18,14 +19,13 @@ export function ChatList({ onSelect }: ChatListProps) {
           <li
             key={contact.name}
             onClick={() => onSelect(contact.name)}
-            className="chat-item"
+            className={`chat-item ${selected === contact.name ? 'selected' : ''}`} // ✅ Usa a prop corretamente
           >
-            <img
-              src={contact.avatar}
-              alt={contact.name}
-              className="avatar"
-            />
-            <span>{contact.name}</span>
+            <img src={contact.avatar} alt={contact.name} className="avatar" />
+            <div className="chat-info">
+              <span className="chat-name">{contact.name}</span>
+              <span className="chat-last">{contact.lastMessage}</span>
+            </div>
           </li>
         ))}
       </ul>
