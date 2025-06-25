@@ -85,6 +85,8 @@ function App() {
     { name: 'A porra do Lórax', avatar: 'https://i.pravatar.cc/40?u=loráx', lastMessage: '' },
     { name: 'Aline Barros', avatar: 'https://i.pravatar.cc/40?u=aline', lastMessage: '' },
     { name: 'K"io Vivi', avatar: 'https://i.pravatar.cc/40?u=kaka', lastMessage: '' },
+    { name: 'Tralalero Tralala', avatar: 'https://i.pravatar.cc/40?u=Tubarão', lastMessage: '' },
+    { name: 'Enel', avatar: 'https://i.pravatar.cc/40?u=Hunter', lastMessage: '' }
   ]);
 
   useEffect(() => {
@@ -106,8 +108,14 @@ function App() {
 
       <main className="chat">
         <div className="chat-header">
+          <img
+            className="chat-header-avatar"
+            src={contacts.find(c => c.name === selectedContact)?.avatar}
+            alt={selectedContact}
+          />
           <h2>{selectedContact}</h2>
         </div>
+
         <h2 className="status">
           Status: {isConnected ? '✅ Conectado' : '❌ Desconectado'}
         </h2>
