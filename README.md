@@ -1,54 +1,36 @@
-# React + TypeScript + Vite
+API responsável pela comunicação entre o FrontChat (aplicação web de chat) e o backend.
+Ela gerencia autenticação de usuários, criação e gerenciamento de chats, envio e listagem de mensagens.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tecnologias Utilizadas:
 
-Currently, two official plugins are available:
+Node.js + Express — servidor e rotas HTTP
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Prisma ORM — acesso e gerenciamento do banco de dados
 
-## Expanding the ESLint configuration
+PostgreSQL — banco de dados relacional
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+JWT (JSON Web Token) — autenticação e segurança
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+bcrypt — criptografia de senhas
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Socket.io — comunicação em tempo real (mensagens instantâneas)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Estrutura do Projeto
+FrontChat-api/
+│-- src/
+│   │-- controllers/   # Lógica de cada recurso
+│   │-- middlewares/   # Middlewares de autenticação/erros
+│   │-- routes/        # Definição das rotas da API
+│   │-- services/      # Regras de negócio
+│   │-- prisma/        # Configuração do ORM
+│   └-- index.ts       # Ponto de entrada do servidor
+│
+│-- package.json
+│-- prisma/schema.prisma
+│-- tsconfig.json
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+A API estará rodando em:
+http://localhost:4000
+
+Este projeto está sob a licença MIT.
+Sinta-se livre para usar, modificar e compartilhar.
